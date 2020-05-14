@@ -52,7 +52,6 @@ import qualified Data.ListLike
 import Data.MoreUnicode.Functor  ( (⊳) )
 import Data.MoreUnicode.Monoid   ( ю )
 import Data.MoreUnicode.Natural  ( ℕ )
-import Data.MoreUnicode.Tasty    ( (≟) )
 
 -- scientific --------------------------
 
@@ -64,11 +63,11 @@ import Test.Tasty  ( TestName, TestTree, testGroup )
 
 -- tasty-hunit -------------------------
 
-import Test.Tasty.HUnit  ( testCase )
+import Test.Tasty.HUnit  ( (@=?), testCase )
 
 -- tasty-plus --------------------------
 
-import TastyPlus  ( runTestsP, runTestsReplay, runTestTree )
+import TastyPlus  ( (≟), runTestsP, runTestsReplay, runTestTree )
 
 -- text --------------------------------
 
@@ -83,6 +82,10 @@ import Text.Fmt  ( fmt )
 -- unordered-containers ----------------
 
 import qualified  Data.HashMap.Strict  as  HashMap
+
+-- utf8-string -------------------------
+
+import Data.String.UTF8  ( fromRep, toRep )
 
 -- yaml --------------------------------
 
@@ -119,7 +122,7 @@ spaces n = Text.replicate (fromIntegral n) " "
 yamlText ∷ Text → Text
 yamlText = let safeInit "" = ""
                safeInit t  = init t
-            in safeInit ∘ convStringLike ∘ encode
+            in safeInit ∘ convStringLike ∘ fromRep ∘ encode
 
 pyaml_ ∷ Value → Text
 pyaml_ Null      = "~"
@@ -159,13 +162,13 @@ pyamlTests =
       tlist = [] ∷ [Text]
 
       decodeText ∷ Text → Either String Value
-      decodeText = first show ∘ decodeEither' ∘ convStringLike
+      decodeText = first show ∘ decodeEither' ∘ toRep ∘ convStringLike
 
       check ∷ TestName → Text → Value → TestTree
       check name expect val =
         testGroup name
                   [ testCase "expect" $ expect ≟ pyaml val
-                  , testCase "parse"  $ Right val ≟ decodeText (pyaml val)]
+                  , testCase "parse"  $ Right val @=? decodeText (pyaml val)]
 
    in testGroup "pyaml"
                 [ check "foo"  foo       (String foo)
