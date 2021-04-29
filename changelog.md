@@ -1,3 +1,7 @@
+1.0.0.2 2021-04-29
+==================
+- dependency upgrades
+
 1.0.0.1 2020-05-14
 ==================
 - use ListLike-4.7, and thus utf8-string
