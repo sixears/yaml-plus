@@ -1,3 +1,7 @@
+1.0.0.3 2021-06-09
+==================
+- replace use of fluffy with natural
+
 1.0.0.2 2021-04-29
 ==================
 - dependency upgrades

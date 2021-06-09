@@ -39,10 +39,6 @@ import Text.Show       ( Show( show ) )
 import Data.Function.Unicode  ( (∘) )
 import Data.Monoid.Unicode    ( (⊕) )
 
--- fluffy ------------------------------
-
-import Fluffy.Foldable  ( length )
-
 -- ListLike ----------------------------
 
 import qualified Data.ListLike
@@ -52,6 +48,10 @@ import qualified Data.ListLike
 import Data.MoreUnicode.Functor  ( (⊳) )
 import Data.MoreUnicode.Monoid   ( ю )
 import Data.MoreUnicode.Natural  ( ℕ )
+
+-- natural -----------------------------
+
+import Natural  ( length )
 
 -- scientific --------------------------
 
@@ -247,7 +247,7 @@ pyamlTests =
 
 tests ∷ TestTree
 tests = testGroup "PYaml" [ pyamlTests ]
-                
+
 ----------------------------------------
 
 _test ∷ IO ExitCode
