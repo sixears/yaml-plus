@@ -1,3 +1,7 @@
+1.0.1.0 2021-07-15
+==================
+- Add HasCallstack instance of YamlParseError
+
 1.0.0.3 2021-06-09
 ==================
 - replace use of fluffy with natural
