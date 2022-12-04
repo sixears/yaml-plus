@@ -1,3 +1,7 @@
+1.0.1.1 2022-12-04
+==================
+- Upgrade for Data.Aeson > 2
+
 1.0.1.0 2021-07-15
 ==================
 - Add HasCallstack instance of YamlParseError

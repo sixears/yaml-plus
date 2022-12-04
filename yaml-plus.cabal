@@ -10,7 +10,7 @@ name:                yaml-plus
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             1.0.1.0
+version:             1.0.1.1
 
 -- A short (one-line) description of the package.
 synopsis:            Utilities for working with YAML
@@ -67,7 +67,7 @@ library
   -- Other library packages from which modules are imported.
   build-depends:     aeson, base, base-unicode-symbols, bytestring, data-textual
                    , lens, ListLike, mtl, scientific, tasty, tasty-hunit, text
-                   , text-printer, unordered-containers, utf8-string, yaml
+                   , text-printer, utf8-string, yaml
 
                    , fpath         >= 1.1.4.2
                    , has-callstack >= 1.0.1.0

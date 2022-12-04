@@ -15,7 +15,11 @@ import Prelude  ( (-), error, fromIntegral )
 
 -- aeson -------------------------------
 
-import Data.Aeson.Types  ( Value( Array, Bool, Null, Number, Object, String ) )
+import qualified  Data.Aeson.KeyMap  as  KeyMap
+
+import Data.Aeson.Key     ( toText )
+import Data.Aeson.Types   ( Key
+                          , Value( Array, Bool, Null, Number, Object, String ) )
 
 -- base --------------------------------
 
@@ -79,10 +83,6 @@ import Data.Text  ( Text, init, intercalate, lines )
 
 import Text.Fmt  ( fmt )
 
--- unordered-containers ----------------
-
-import qualified  Data.HashMap.Strict  as  HashMap
-
 -- utf8-string -------------------------
 
 import Data.String.UTF8  ( fromRep, toRep )
@@ -99,7 +99,7 @@ array = Array ∘ fromList
 arrayN ∷ [Scientific] → Value
 arrayN = array ∘ fmap Number
 
-objectTs ∷ [(Text,Text)] → Value
+objectTs ∷ [(Key,Text)] → Value
 objectTs = object ∘ fmap (second String)
 
 convStringLike ∷ (Data.ListLike.StringLike α,Data.ListLike.StringLike β) ⇒ α → β
@@ -135,16 +135,16 @@ pyaml_ (Array (toList → xs)) =
 
 pyaml_ (Object m) =
     let maxLen ∷ ℕ
-        maxLen = fromIntegral (maximum $ Text.length ⊳ HashMap.keys m)
+        maxLen = fromIntegral (maximum $ Text.length ∘ toText ⊳ KeyMap.keys m)
         pad ∷ Text → Text
         pad t = t ⊕ spaces (fromIntegral (maxLen - tlength t) `max` 0)
      in case length m of
           0 → "{}"
           _ → intercalate "\n" $
                 ю [ if isCompoundValue v
-                    then ( [fmt|%t :|] (pad k) : indent 2 (t:ts) )
-                    else [ [fmt|%t : %t|] (pad k) t ]
-                  | (k,v) ← sortOn fst (HashMap.toList m)
+                    then ( [fmt|%t :|] (pad $ toText k) : indent 2 (t:ts) )
+                    else [ [fmt|%t : %t|] (pad $ toText k) t ]
+                  | (k,v) ← sortOn fst (KeyMap.toList m)
                   , let (t:ts) = lines (pyaml_ v)
                   ]
 
@@ -153,12 +153,12 @@ pyaml = pyaml_ ∘ toJSON
 
 pyamlTests ∷ TestTree
 pyamlTests =
-  let foo  = "foo" ∷ Text
+  let foo  = "foo" ∷ Key
       _bob = "'bob" ∷ Text
       bar  = "bar" ∷ Text
-      x    = "x" ∷ Text
+      x    = "x" ∷ Key
       y    = "y" ∷ Text
-      quux = "quux" ∷ Text
+      quux = "quux" ∷ Key
       tlist = [] ∷ [Text]
 
       decodeText ∷ Text → Either String Value
@@ -171,7 +171,7 @@ pyamlTests =
                   , testCase "parse"  $ Right val @=? decodeText (pyaml val)]
 
    in testGroup "pyaml"
-                [ check "foo"  foo       (String foo)
+                [ check "foo"  (toText foo)       (String $ toText foo)
                   -- I would like to fix this, but not today
                 , check "y"     "'y'"     (String y)
                 , check "bo'b"  "bo'b"    (String "bo'b")
@@ -185,7 +185,7 @@ pyamlTests =
                 , check "list2" "- 1\n- 1"      (arrayN [ 1, 1 ])
                 , check "list3" "- 1\n- 1\n- 2" (arrayN [ 1, 1, 2 ])
 
-                , check "map0" "{}"             (object ([]∷[(Text,Value)]))
+                , check "map0" "{}"             (object ([]∷[(Key,Value)]))
                 , check "map1" "foo : bar"      (object [(foo,String bar)])
                 , check "map1'" "foo : '''bob'" (object [(foo,String _bob)])
                 , check "map2" "foo  : bar\nquux : 'y'\nx    : 'y'"
